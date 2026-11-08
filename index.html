@@ -421,7 +421,7 @@ document.getElementById('pix').scrollIntoView({behavior:'smooth'});
 fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({amount:total})})
 .then(function(r){return r.json().catch(function(){return {}}).then(function(j){if(!r.ok){var e=new Error('http');e.code=r.status;e.body=j;throw e}return j})})
 .then(function(j){mostrarPix(j,total)})
-.catch(function(e){console.log('Erro Pix',e,e&&e.body);if(s)s.textContent='Não foi possível gerar o Pix agora. Tente novamente em instantes. (código: '+(e&&e.code?e.code:'rede')+')'});
+.catch(function(e){console.log('Erro Pix',e,e&&e.body);if(s)s.textContent='Não foi possível gerar o Pix agora. Tente novamente em instantes. (código: '+(e&&e.code?e.code:'rede')+')';if(e&&e.body){var dbg=document.createElement('div');dbg.style.cssText='font-size:.7rem;font-weight:400;color:#64748b;margin-top:8px;word-break:break-all';dbg.textContent='Detalhe técnico: '+JSON.stringify(e.body).slice(0,400);document.getElementById('pixBox').appendChild(dbg)}});
 });
 })();
 </script>
