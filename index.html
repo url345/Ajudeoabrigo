@@ -14,7 +14,9 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 header{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:#fff;border-bottom:1px solid #e5e5e5}
 .bar{max-width:720px;margin:0 auto;display:flex;align-items:center;gap:12px;padding:10px 20px}
 .logo{height:44px;width:auto;max-width:140px;object-fit:contain;display:block}
-.logo2{height:38px;width:auto;max-width:90px;object-fit:contain;display:block;border-radius:10px;border:2px solid #9fd3b2;animation:glow 2.2s ease-in-out infinite}
+.bar{position:relative}
+.logo2{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);height:38px;width:auto;max-width:90px;object-fit:contain;display:block;border-radius:10px;border:2px solid #0a2a6b;background:#fff;animation:glowNavy 2s ease-in-out infinite}
+@keyframes glowNavy{0%,100%{box-shadow:0 0 6px 1px rgba(10,42,107,.45)}50%{box-shadow:0 0 16px 4px rgba(37,99,235,.85)}}
 .burger{background:none;border:0;padding:8px 8px 8px 0;cursor:pointer;display:flex;flex-direction:column;gap:5px}
 .burger span{display:block;width:26px;height:3px;background:var(--green);border-radius:2px}
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:opacity .25s;z-index:40}
@@ -28,7 +30,7 @@ header{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:#f
 .badge{margin-top:auto;display:flex;align-items:center;justify-content:center;gap:10px;background:#eaf7ee;color:var(--green-dark);border:2px solid #bfe6cb;border-radius:14px;padding:16px;font-weight:900;font-size:1rem}
 .badge svg{width:22px;height:22px;fill:var(--green-dark)}
 main{max-width:720px;margin:0 auto;padding:32px 20px 210px}
-h1{margin:0 0 20px;font-weight:700;line-height:1.2;letter-spacing:-.01em;color:#111;font-size:calc(min(100vw - 40px, 680px) / 17)}
+h1{margin:0 0 20px;font-weight:700;line-height:1.2;letter-spacing:-.01em;color:#111;font-size:calc(min(100vw - 40px, 680px) / 13)}
 h1 span{display:block;white-space:nowrap}
 .hero{display:block;width:calc(100% + 40px);margin:0 -20px 18px;aspect-ratio:16/10;background:#eaf7ee;border-top:1px solid #bfe6cb;border-bottom:1px solid #bfe6cb;object-fit:cover;color:var(--green-dark);font-weight:900;display:flex;align-items:center;justify-content:center}
 .tags{display:flex;align-items:center;gap:8px;flex-wrap:nowrap;margin:0 0 8px}
@@ -181,8 +183,8 @@ section.apoie{background:#fff;border:1px solid #e6e9ed;border-radius:18px;box-sh
 </aside>
 
 <main>
-<h1><span>Organização humanitária de</span><span>Angola – ação direta,</span><span>dignidade e contas abertas.</span></h1>
-<div class="hero" id="hero"><img src="file_000000009da4820ea01cb269a6170939_convert.jpg" alt="Organização humanitária de Angola" onerror="this.style.display='none'">Imagem em breve</div>
+<h1><span>Seu gesto salva</span><span>vidas que só precisam</span><span>de amor.</span></h1>
+<div class="hero" id="hero"><img src="file_0000000025a0820ea40c1ee5fc738b7b_convert.jpg" alt="Organização humanitária de Angola" onerror="this.style.display='none'">Imagem em breve</div>
 <div class="tags"><span class="tag">Saúde / Tratamentos</span></div>
 <div class="stats">
 <div class="nums">
