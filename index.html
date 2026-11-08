@@ -419,9 +419,9 @@ box.textContent='';
 if(s)s.textContent='Gerando seu Pix de '+brl(total)+'...';
 document.getElementById('pix').scrollIntoView({behavior:'smooth'});
 fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({amount:total})})
-.then(function(r){return r.json().then(function(j){if(!r.ok)throw j;return j})})
+.then(function(r){return r.json().catch(function(){return {}}).then(function(j){if(!r.ok){var e=new Error('http');e.code=r.status;e.body=j;throw e}return j})})
 .then(function(j){mostrarPix(j,total)})
-.catch(function(){if(s)s.textContent='Não foi possível gerar o Pix agora. Tente novamente em instantes.'});
+.catch(function(e){console.log('Erro Pix',e,e&&e.body);if(s)s.textContent='Não foi possível gerar o Pix agora. Tente novamente em instantes. (código: '+(e&&e.code?e.code:'rede')+')'});
 });
 })();
 </script>
