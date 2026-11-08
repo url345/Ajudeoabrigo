@@ -12,6 +12,10 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Valor inválido' });
   }
 
+  if (!process.env.NOVAPAY_CI || !process.env.NOVAPAY_CS) {
+    return res.status(500).json({ error: 'Chaves NOVAPAY_CI/NOVAPAY_CS não configuradas na Vercel' });
+  }
+
   try {
     const r = await fetch('https://api.anovapay.com.br/charges', {
       method: 'POST',
@@ -26,9 +30,13 @@ export default async function handler(req, res) {
       }),
     });
     const data = await r.json().catch(() => ({}));
-    if (!r.ok) return res.status(502).json({ error: 'Falha ao gerar o Pix', detail: data });
+    if (!r.ok) {
+      console.error('Nova Pay respondeu', r.status, JSON.stringify(data));
+      return res.status(502).json({ error: 'Falha ao gerar o Pix', status: r.status, detail: data });
+    }
     return res.status(200).json(data);
   } catch (e) {
-    return res.status(502).json({ error: 'Falha ao gerar o Pix' });
+    console.error('Erro ao chamar a Nova Pay', e);
+    return res.status(502).json({ error: 'Falha ao chamar a Nova Pay', detail: String(e && e.message) });
   }
 }
