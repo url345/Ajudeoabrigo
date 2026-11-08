@@ -280,6 +280,7 @@ Gerar Pix agora
 
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script>
 var b=document.getElementById('menuBtn'),d=document.getElementById('drawer'),o=document.getElementById('overlay');
 function set(v){d.classList.toggle('open',v);o.classList.toggle('open',v);b.setAttribute('aria-expanded',v)}
@@ -312,6 +313,7 @@ bindShare('shareBtn','shareTxt');bindShare('shareBtn2','shareTxt2');
 // Modal de doação
 (function(){
 var VALORES=[5,10,20,50,100,150,200,500,1000],POPULAR=50,BOOST=8.90;
+var API_URL='https://SEU-PROJETO.vercel.app/api/charge'; // troque pelo endereço do seu projeto na Vercel
 var ov=document.getElementById('vmOv'),sh=document.getElementById('vmSheet'),grid=document.getElementById('vmGrid'),
 inp=document.getElementById('vmInp'),err=document.getElementById('vmErr'),
 S1=document.getElementById('vmS1'),S2=document.getElementById('vmS2'),
@@ -322,6 +324,27 @@ window.valorDoacao=0;
 window.dadosDoacao=null;
 function brl(n){return 'R$ '+n.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}
 function passo(n){S1.hidden=(n!==1);S2.hidden=(n!==2)}
+function achar(o,t){var r=null;(function w(x){if(r||x==null)return;if(typeof x==='string'){if(t(x))r=x;return}if(typeof x==='object')for(var k in x)w(x[k])})(o);return r}
+function mostrarPix(j,total){
+var s=document.querySelector('#pix p'),box=document.getElementById('pixBox');
+var code=achar(j,function(x){return x.indexOf('000201')===0});
+var img=achar(j,function(x){return x.indexOf('data:image')===0||/^iVBOR/.test(x)});
+if(!code&&!img){s.textContent='Pix gerado, mas a resposta veio em formato inesperado.';return}
+s.textContent='Pague '+brl(total)+' com Pix:';
+var qr=document.createElement('div');qr.style.cssText='display:inline-block;padding:12px;background:#fff;border:2px solid #0a2a6b;border-radius:14px';
+if(code&&window.QRCode){new QRCode(qr,{text:code,width:200,height:200})}
+else if(img){var im=new Image();im.width=200;im.src=img.indexOf('data:')===0?img:'data:image/png;base64,'+img;qr.appendChild(im)}
+box.appendChild(qr);
+if(code){
+var inp2=document.createElement('input');inp2.className='vm-f';inp2.readOnly=true;inp2.value=code;inp2.style.marginTop='14px';
+var bt=document.createElement('button');bt.type='button';bt.className='share';bt.textContent='Copiar código Pix';
+bt.addEventListener('click',function(){
+var ok=function(){bt.textContent='Código copiado!';setTimeout(function(){bt.textContent='Copiar código Pix'},2000)};
+if(navigator.clipboard){navigator.clipboard.writeText(code).then(ok).catch(function(){inp2.select()})}else{inp2.select();document.execCommand('copy');ok()}
+});
+box.appendChild(inp2);box.appendChild(bt);
+}
+}
 
 VALORES.forEach(function(v){
 var c=document.createElement('button');c.type='button';c.className='vm-chip';c.dataset.v=v;
@@ -389,11 +412,16 @@ if(td&&td.length<10){err2.textContent='Celular incompleto. Confira o DDD e o nú
 var total=window.valorDoacao+(boost.checked?BOOST:0);
 window.dadosDoacao={valor:window.valorDoacao,turbinar:boost.checked,total:total,nome:anon.checked?'Anônimo':nm,anonimo:anon.checked,telefone:td};
 fechar();
-// PRÓXIMO PASSO: enviar window.dadosDoacao ao provedor de Pix
-// e mostrar o QR Code + "copia e cola" dentro da seção #pix.
 var s=document.querySelector('#pix p');
-if(s)s.textContent='Valor do Pix: '+brl(total);
+var box=document.getElementById('pixBox');
+if(!box){box=document.createElement('div');box.id='pixBox';box.style.cssText='margin-top:14px;text-align:center';document.getElementById('pix').appendChild(box)}
+box.textContent='';
+if(s)s.textContent='Gerando seu Pix de '+brl(total)+'...';
 document.getElementById('pix').scrollIntoView({behavior:'smooth'});
+fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({amount:total})})
+.then(function(r){return r.json().then(function(j){if(!r.ok)throw j;return j})})
+.then(function(j){mostrarPix(j,total)})
+.catch(function(){if(s)s.textContent='Não foi possível gerar o Pix agora. Tente novamente em instantes.'});
 });
 })();
 </script>
