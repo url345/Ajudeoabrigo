@@ -278,6 +278,19 @@ Gerar Pix agora
 <div class="vm-safe"><svg viewBox="0 0 24 24"><path d="M12 2l8 3v6c0 5-3.4 9.3-8 11-4.6-1.7-8-6-8-11V5z"/></svg>Pagamento 100% seguro</div>
 </div>
 
+
+<!-- Passo 3: Pix -->
+<div class="vm-step" id="vmS3" hidden>
+<div class="vm-h2">
+<span style="width:38px"></span>
+<h3 class="vm-t2">Pague com Pix</h3>
+<button class="vm-x" id="vmX3" type="button" aria-label="Fechar"><svg viewBox="0 0 24 24"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
+</div>
+<div class="vm-don">Valor do Pix <b id="vmDon3">R$ 0,00</b></div>
+<p id="vmMsg3" style="text-align:center;font-weight:600;font-size:.95rem;color:#334155;margin:0 0 12px">Gerando seu Pix...</p>
+<div id="pixBox" style="text-align:center"></div>
+<div class="vm-safe"><svg viewBox="0 0 24 24"><path d="M12 2l8 3v6c0 5-3.4 9.3-8 11-4.6-1.7-8-6-8-11V5z"/></svg>Pagamento 100% seguro</div>
+</div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -323,10 +336,10 @@ err2=document.getElementById('vmErr2'),don=document.getElementById('vmDon');
 window.valorDoacao=0;
 window.dadosDoacao=null;
 function brl(n){return 'R$ '+n.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}
-function passo(n){S1.hidden=(n!==1);S2.hidden=(n!==2)}
+function passo(n){S1.hidden=(n!==1);S2.hidden=(n!==2);document.getElementById('vmS3').hidden=(n!==3)}
 function achar(o,t){var r=null;(function w(x){if(r||x==null)return;if(typeof x==='string'){if(t(x))r=x;return}if(typeof x==='object')for(var k in x)w(x[k])})(o);return r}
 function mostrarPix(j,total){
-var s=document.querySelector('#pix p'),box=document.getElementById('pixBox');
+var s=document.getElementById('vmMsg3'),box=document.getElementById('pixBox');
 var code=achar(j,function(x){return x.indexOf('000201')===0});
 var img=achar(j,function(x){return x.indexOf('data:image')===0||/^iVBOR/.test(x)});
 if(!code&&!img){s.textContent='Pix gerado, mas a resposta veio em formato inesperado.';return}
@@ -361,10 +374,11 @@ inp.value=inp.value.replace(/[^0-9,\.]/g,'');
 grid.querySelectorAll('.vm-chip').forEach(function(x){x.classList.toggle('sel',x.dataset.v===inp.value)});
 err.textContent='';
 });
-function abrir(){passo(1);sh.classList.add('open');ov.classList.add('open');document.body.style.overflow='hidden'}
+function abrir(){document.getElementById('pixBox').textContent='';passo(1);sh.classList.add('open');ov.classList.add('open');document.body.style.overflow='hidden'}
 function fechar(){sh.classList.remove('open');ov.classList.remove('open');document.body.style.overflow=''}
 document.getElementById('vmX').addEventListener('click',fechar);
 document.getElementById('vmX2').addEventListener('click',fechar);
+document.getElementById('vmX3').addEventListener('click',fechar);
 ov.addEventListener('click',fechar);
 document.addEventListener('keydown',function(e){if(e.key==='Escape')fechar()});
 document.querySelectorAll('a.cta,a.dbtn,a.pixbtn').forEach(function(a){
@@ -411,17 +425,15 @@ var td=tel.value.replace(/\D/g,'');
 if(td&&td.length<10){err2.textContent='Celular incompleto. Confira o DDD e o número.';return}
 var total=window.valorDoacao+(boost.checked?BOOST:0);
 window.dadosDoacao={valor:window.valorDoacao,turbinar:boost.checked,total:total,nome:anon.checked?'Anônimo':nm,anonimo:anon.checked,telefone:td};
-fechar();
-var s=document.querySelector('#pix p');
-var box=document.getElementById('pixBox');
-if(!box){box=document.createElement('div');box.id='pixBox';box.style.cssText='margin-top:14px;text-align:center';document.getElementById('pix').appendChild(box)}
+document.getElementById('vmDon3').textContent=brl(total);
+var s=document.getElementById('vmMsg3'),box=document.getElementById('pixBox');
 box.textContent='';
-if(s)s.textContent='Gerando seu Pix de '+brl(total)+'...';
-document.getElementById('pix').scrollIntoView({behavior:'smooth'});
+s.textContent='Gerando seu Pix...';
+passo(3);
 fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({amount:total})})
 .then(function(r){return r.json().catch(function(){return {}}).then(function(j){if(!r.ok){var e=new Error('http');e.code=r.status;e.body=j;throw e}return j})})
 .then(function(j){mostrarPix(j,total)})
-.catch(function(e){console.log('Erro Pix',e,e&&e.body);if(s)s.textContent='Não foi possível gerar o Pix agora. Tente novamente em instantes. (código: '+(e&&e.code?e.code:'rede')+')';if(e&&e.body){var dbg=document.createElement('div');dbg.style.cssText='font-size:.7rem;font-weight:400;color:#64748b;margin-top:8px;word-break:break-all';dbg.textContent='Detalhe técnico: '+JSON.stringify(e.body).slice(0,400);document.getElementById('pixBox').appendChild(dbg)}});
+.catch(function(e){console.log('Erro Pix',e,e&&e.body);s.textContent='Não foi possível gerar o Pix agora. Tente novamente em instantes. (código: '+(e&&e.code?e.code:'rede')+')'});
 });
 })();
 </script>
